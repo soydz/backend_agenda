@@ -34,9 +34,15 @@ app.get('/api/persons/:id', (req, res) => {
 // POST
 app.post('/api/persons', (req, res) => {
     const note = req.body
+    const nameDuplicado = data.find(person => person.name.toLowerCase() === note.name.toLowerCase())
+
     if (!note.name || !note.number) {
         return res.status(400).json({
             error: "Content Missing"
+        })
+    } else if (nameDuplicado) {
+        return res.status(409).json({
+            error: 'name must be unique'
         })
     }
 
