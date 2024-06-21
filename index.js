@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 
-const data = require('./data.json')
+let data = require('./data.json')
 const noData = {
     data: 'No Data'
 }
@@ -28,6 +28,13 @@ app.get('/api/persons/:id', (req, res) => {
         return res.json(noData)
     }
     res.json(person)
+})
+
+// DELETE
+app.delete('/api/persons/:id', (req, res) => {
+    const id = Number(req.params.id)
+    data = data.filter(note => note.id !== id)
+    res.status(204).end()
 })
 
 const PORT = 3025
