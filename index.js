@@ -1,6 +1,8 @@
 const express = require('express')
+const morgan = require('morgan')
+
 const app = express()
-app.use(express.json())
+app.use(morgan('tiny'))
 
 let data = require('./data.json')
 const noData = {
@@ -8,7 +10,7 @@ const noData = {
 }
 
 app.get('/', (req, res) => {
-    res.send('<h1>Hello World</h1>')
+    res.send('<h1>Agenda telefónica</h1>')
 })
 
 app.get('/info', (req, res) => {
