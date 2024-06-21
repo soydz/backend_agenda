@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+app.use(express.json())
 
 let data = require('./data.json')
 const noData = {
@@ -28,6 +29,26 @@ app.get('/api/persons/:id', (req, res) => {
         return res.json(noData)
     }
     res.json(person)
+})
+
+// POST
+app.post('/api/persons', (req, res) => {
+    const note = req.body
+    if (!note.name || !note.number) {
+        return res.status(400).json({
+            error: "Content Missing"
+        })
+    }
+
+    const generateId = Math.ceil((Math.random() * 150))
+    const newNote = {
+        id: generateId,
+        name: note.name,
+        number: note.number
+    }
+
+    data = data.concat(newNote)
+    res.json(note)
 })
 
 // DELETE
