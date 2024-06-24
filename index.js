@@ -1,6 +1,8 @@
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+const mongoose = require('mongoose')
 
 const app = express()
 
@@ -11,7 +13,22 @@ app.use(express.json())
 app.use(cors())
 app.use(express.static('dist'))
 
-let data = require('./data.json')
+const URL = process.env.Mongo_URL
+mongoose.set('strictQuery', false)
+mongoose.connect(URL)
+
+const personSchema = new mongoose.Schema({
+    name: String,
+    number: Number,
+})
+
+const Person = mongoose.model('Person', personSchema)
+
+const person = new Person({
+    name: process.argv[3],
+    number: process.argv[4],
+})
+
 const noData = {
     data: 'No Data'
 }
@@ -27,17 +44,19 @@ app.get('/info', (req, res) => {
 })
 
 app.get('/api/persons', (req, res) => {
-    res.json(data)
+    Person.find({})
+        .then(result => {
+            res.json(result)
+        })
+    // mongoose.connection.close()
 })
 
 app.get('/api/persons/:id', (req, res) => {
-    const id = Number(req.params.id)
-    let person = data.find(item => item.id === id)
-    if (!person) {
-        res.status(404)
-        return res.json(noData)
-    }
-    res.json(person)
+    Person.findById(req.params.id)
+        .then(result => {
+            res.json(result)
+        })
+    // mongoose.connection.close()
 })
 
 // POST
