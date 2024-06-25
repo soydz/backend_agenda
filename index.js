@@ -1,8 +1,7 @@
-require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
-const mongoose = require('mongoose')
+const Person = require('./model/person')
 
 const app = express()
 
@@ -12,26 +11,6 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :r
 app.use(express.json())
 app.use(cors())
 app.use(express.static('dist'))
-
-const URL = process.env.Mongo_URL
-mongoose.set('strictQuery', false)
-mongoose.connect(URL)
-
-const personSchema = new mongoose.Schema({
-    name: String,
-    number: Number,
-})
-
-const Person = mongoose.model('Person', personSchema)
-
-const person = new Person({
-    name: process.argv[3],
-    number: process.argv[4],
-})
-
-const noData = {
-    data: 'No Data'
-}
 
 app.get('/', (req, res) => {
     res.send('<h1>Agenda telefónica</h1>')
@@ -48,7 +27,6 @@ app.get('/api/persons', (req, res) => {
         .then(result => {
             res.json(result)
         })
-    // mongoose.connection.close()
 })
 
 app.get('/api/persons/:id', (req, res) => {
@@ -56,33 +34,26 @@ app.get('/api/persons/:id', (req, res) => {
         .then(result => {
             res.json(result)
         })
-    // mongoose.connection.close()
 })
 
 // POST
 app.post('/api/persons', (req, res) => {
     const note = req.body
-    const nameDuplicado = data.find(person => person.name.toLowerCase() === note.name.toLowerCase())
 
     if (!note.name || !note.number) {
         return res.status(400).json({
             error: "Content Missing"
         })
-    } else if (nameDuplicado) {
-        return res.status(409).json({
-            error: 'name must be unique'
-        })
     }
 
-    const generateId = Math.ceil((Math.random() * 150))
-    const newNote = {
-        id: generateId,
+    const person = new Person({
         name: note.name,
         number: note.number
-    }
+    })
 
-    data = data.concat(newNote)
-    res.json(note)
+    person.save()
+        .then(result => {
+        })
 })
 
 // DELETE
