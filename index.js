@@ -12,21 +12,23 @@ app.use(express.json())
 app.use(cors())
 app.use(express.static('dist'))
 
-app.get('/', (req, res) => {
-    res.send('<h1>Agenda telefónica</h1>')
+
+app.get('/info', (req, res, next) => {
+    Person.countDocuments({}, { hint: "_id_" })
+        .then(result => {
+            let dato1 = `<p>Phonebook has info for ${result} people</p>`
+            let dato2 = `<p>${new Date()}</p>`
+            res.send(dato1 + dato2)
+        })
+        .catch(error => next(error))
 })
 
-app.get('/info', (req, res) => {
-    let dato1 = `<p>Phonebook has info for ${data.length} people</p>`
-    let dato2 = `<p>${new Date()}</p>`
-    res.send(dato1 + dato2)
-})
-
-app.get('/api/persons', (req, res) => {
+app.get('/api/persons', (req, res, next) => {
     Person.find({})
         .then(result => {
             res.json(result)
         })
+        .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (req, res, next) => {
@@ -42,7 +44,7 @@ app.get('/api/persons/:id', (req, res, next) => {
 })
 
 // POST
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
     const note = req.body
 
     if (!note.name || !note.number) {
@@ -60,6 +62,7 @@ app.post('/api/persons', (req, res) => {
                 console.log('Disponible')
             }
         })
+        .catch(error => next(error))
 
     const person = new Person({
         name: note.name,
@@ -69,6 +72,7 @@ app.post('/api/persons', (req, res) => {
     person.save()
         .then(result => {
         })
+        .catch(error => next(error))
 })
 
 // PUT
