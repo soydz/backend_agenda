@@ -29,11 +29,16 @@ app.get('/api/persons', (req, res) => {
         })
 })
 
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
     Person.findById(req.params.id)
         .then(result => {
-            res.json(result)
+            if (result) {
+                res.json(result)
+            } else {
+                res.status(404).end()
+            }
         })
+        .catch(error => next(error))
 })
 
 // POST
@@ -59,14 +64,22 @@ app.post('/api/persons', (req, res) => {
 // DELETE
 app.delete('/api/persons/:id', (req, res, next) => {
     Person.findByIdAndDelete(req.params.id)
-    .then(result => {
-        res.status(204).end()
-    })
-    .catch(error => next(error))
-
-    //data = data.filter(note => note.id !== id)
-    //res.status(204).end()
+        .then(result => {
+            res.status(204).end()
+        })
+        .catch(error => next(error))
 })
+
+const errorHandler = (error, req, res, next) => {
+    console.log(error.message)
+    if (error.name === 'CastError') {
+        return res.status(400).send({
+            error: 'Recurso no encontrado'
+        })
+    }
+    next(error)
+}
+app.use(errorHandler)
 
 
 const PORT = process.env.PORT || 3025
