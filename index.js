@@ -51,6 +51,16 @@ app.post('/api/persons', (req, res) => {
         })
     }
 
+    Person.findById(req.params.id)
+        .then(result => {
+            console.log('resultado', result)
+            if (result) {
+                console.log('duplicado')
+            } else {
+                console.log('Disponible')
+            }
+        })
+
     const person = new Person({
         name: note.name,
         number: note.number
@@ -59,6 +69,22 @@ app.post('/api/persons', (req, res) => {
     person.save()
         .then(result => {
         })
+})
+
+// PUT
+app.put('/api/persons/:id', (req, res, next) => {
+    const body = req.body
+    const id = req.params.id
+
+    const person = {
+        number: body.number
+    }
+
+    Person.findByIdAndUpdate(id, person, { new: true })
+        .then(updatePerson => {
+            res.json(updatePerson)
+        })
+        .catch(error => next(error))
 })
 
 // DELETE
