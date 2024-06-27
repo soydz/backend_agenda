@@ -52,10 +52,10 @@ app.post('/api/persons', (req, res, next) => {
             error: "Content Missing"
         })
     }
+    /*
 
     Person.findById(req.params.id)
         .then(result => {
-            console.log('resultado', result)
             if (result) {
                 console.log('duplicado')
             } else {
@@ -63,7 +63,7 @@ app.post('/api/persons', (req, res, next) => {
             }
         })
         .catch(error => next(error))
-
+*/
     const person = new Person({
         name: note.name,
         number: note.number
@@ -71,6 +71,7 @@ app.post('/api/persons', (req, res, next) => {
 
     person.save()
         .then(result => {
+            res.status(201).end()
         })
         .catch(error => next(error))
 })
