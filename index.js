@@ -100,6 +100,12 @@ app.delete('/api/persons/:id', (req, res, next) => {
         .catch(error => next(error))
 })
 
+const notFound = (req, res, next) => {
+    res.status(404).send({
+        error: 'Error 404'
+    })
+}
+
 const errorHandler = (error, req, res, next) => {
     console.log(error.message)
     if (error.name === 'CastError') {
@@ -109,6 +115,8 @@ const errorHandler = (error, req, res, next) => {
     }
     next(error)
 }
+
+app.use(notFound)
 app.use(errorHandler)
 
 
